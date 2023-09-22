@@ -77,7 +77,10 @@ class ProductUser(models.Model):
         verbose_name = 'продукт пользователя'
         verbose_name_plural = 'продукты пользователя'
         constraints = [
-            UniqueConstraint(fields=['owner', 'product'], name='unique_product_owner')
+            UniqueConstraint(
+                fields=['owner', 'product'],
+                name='unique_product_owner'
+                )
         ]
 
 
@@ -94,7 +97,8 @@ class UserLesson(models.Model):
         verbose_name='Урок',
         on_delete=models.SET_NULL,
         null=True,
-        blank=True
+        blank=True,
+        related_name='user_lesson'
     )
     viewed_time = models.PositiveIntegerField(
         verbose_name='Просмотренное время',
@@ -105,11 +109,18 @@ class UserLesson(models.Model):
         verbose_name='Просмотрено ли',
         default=False
     )
+    last_viewed_at = models.DateTimeField(
+        verbose_name='Последний раз просмотрено',
+        auto_now=True
+    )
 
     class Meta:
         ordering = ['id']
         verbose_name = 'урок в продукте'
         verbose_name_plural = 'уроки в продукте'
         constraints = [
-            UniqueConstraint(fields=['user', 'lesson'], name='unique_user_lesson')
+            UniqueConstraint(
+                fields=['user', 'lesson'],
+                name='unique_user_lesson'
+                )
         ]
