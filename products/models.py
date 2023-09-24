@@ -40,7 +40,8 @@ class Lesson(models.Model):
         Product,
         verbose_name='Продукт',
         on_delete=models.SET_NULL,
-        null=True
+        null=True,
+        related_name='lessons'
     )
 
     def __str__(self):
@@ -65,11 +66,8 @@ class ProductUser(models.Model):
         verbose_name='Продукт',
         on_delete=models.SET_NULL,
         null=True,
-        blank=True
-    )
-    access = models.BooleanField(
-        verbose_name='Есть ли доступ',
-        default=False
+        blank=True,
+        related_name='product_user'
     )
 
     class Meta:
@@ -116,11 +114,21 @@ class UserLesson(models.Model):
 
     class Meta:
         ordering = ['id']
-        verbose_name = 'урок в продукте'
-        verbose_name_plural = 'уроки в продукте'
+        verbose_name = 'урок пользователя'
+        verbose_name_plural = 'уроки пользователей'
         constraints = [
             UniqueConstraint(
                 fields=['user', 'lesson'],
                 name='unique_user_lesson'
                 )
         ]
+
+    def save(self, *args, **kwargs):
+        if self.viewed_time is not None and self.lesson is not None:
+            lesson_duration = self.lesson.duration
+            if (self.viewed_time / lesson_duration) >= 0.8:
+                self.is_viewed = True
+            else:
+                self.is_viewed = False
+
+        super().save(*args, **kwargs)
